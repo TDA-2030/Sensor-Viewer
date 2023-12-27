@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="main">
+    <file>logo_transparent.png</file>
+    <file>logo.ico</file>
+    <file>bg.jpg</file>
+    <file>connect.png</file>
+    <file>disconnect.png</file>
+  </qresource>
+</RCC>

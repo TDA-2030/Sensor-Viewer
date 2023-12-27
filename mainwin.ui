@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Sensor Viewer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="main.qrc">
+    <normaloff>:/main/logo.ico</normaloff>:/main/logo.ico</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="styleSheet">
+       <string notr="true">#groupBox{border-image: url(:/main/bg.jpg);
+border: 0px solid #42adff;
+
+}
+
+QPushButton{
+    height: 22px;
+    border-radius: 8px;
+	border: 0px solid;
+	
+	border-color: rgb(29, 211, 176);
+	
+	background-color: qlineargradient(spread:pad, x1:0.227, y1:0.46, x2:0.886, y2:0.193182, stop:0 rgba(191, 189, 255, 255), stop:0.596591 rgba(131, 202, 235, 255), stop:1 rgba(159, 214, 208, 255));
+	color: rgb(255, 255, 255);
+	font: 15px &quot;SimHei&quot;
+}
+QPushButton:hover{
+	background-color: rgba(176, 208, 211, 160);
+}
+QPushButton:pressed{
+	background-color: rgba(176, 208, 211, 230);
+}</string>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item row="1" column="1">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QGroupBox{
+border:0px solid rgb(10, 100, 10);
+border-left:1px solid rgb(100, 100, 10);
+}</string>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <property name="spacing">
+           <number>16</number>
+          </property>
+          <property name="leftMargin">
+           <number>4</number>
+          </property>
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="rightMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QTabWidget" name="tabWidget">
+            <property name="styleSheet">
+             <string notr="true">
+
+QTabWidget::pane {
+border-top:1px solid rgba(200, 200, 100, 150);
+
+background: rgba(150, 100, 100, 0); 
+}
+
+
+QTabBar::tab
+{
+	
+	color: rgb(241, 241, 241);
+     font: 12pt &quot;SimHei&quot;;
+     background-color:rgba(104,191,249,50);
+     min-width: 40px;
+     min-height: 30px;
+	 padding:1px;
+
+     border-top-left-radius: 8px;
+     border-top-right-radius: 8px;
+  
+}
+
+QTabBar::tab:!selected
+{
+	margin-top:5px;
+}
+
+QTabBar::tab:selected
+{
+	font: 13pt &quot;SimHei&quot;;
+    background-color: rgba(228, 233, 242, 50);
+	
+	border-top:1px solid rgb(100, 100, 10);
+	border-left:1px solid rgb(100, 100, 10);
+	border-right:1px solid rgb(100, 100, 10);
+
+}
+
+QLineEdit{
+background-color: rgba(255, 170, 255, 50);
+color: rgb(255, 255, 255);
+border:0px solid rgb(10, 100, 10);
+border-left:5px solid rgb(10, 100, 10);
+}
+</string>
+            </property>
+            <property name="tabPosition">
+             <enum>QTabWidget::North</enum>
+            </property>
+            <property name="tabShape">
+             <enum>QTabWidget::Rounded</enum>
+            </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="tab_fbg">
+             <property name="styleSheet">
+              <string notr="true">#tab_fbg{background-color: rgba(255, 255, 255, 0);}</string>
+             </property>
+             <attribute name="title">
+              <string>FBG</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLineEdit" name="ipaddress_edit">
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>192.168.1.101:7102</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_fbgconfig">
+                <property name="text">
+                 <string>清零基线</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_fbg">
+                <property name="styleSheet">
+                 <string notr="true">color: rgb(255, 255, 255);</string>
+                </property>
+                <property name="text">
+                 <string>采集</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_fbga">
+             <property name="styleSheet">
+              <string notr="true">#tab_fbga{background-color: rgba(255, 255, 255, 0);}</string>
+             </property>
+             <attribute name="title">
+              <string>FBGA</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <widget class="QLineEdit" name="lineEdit_fbga">
+                <property name="text">
+                 <string>192.168.0.111:4567</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_fbga_config">
+                <property name="text">
+                 <string>清零基线</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_fbga">
+                <property name="styleSheet">
+                 <string notr="true">color: rgb(255, 255, 255);</string>
+                </property>
+                <property name="text">
+                 <string>采集</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_sg">
+             <property name="styleSheet">
+              <string notr="true">#tab_sg{background-color: rgba(255, 255, 255, 0);}</string>
+             </property>
+             <attribute name="title">
+              <string>SG</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QLineEdit" name="lineEdit_com">
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>COM3</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_com_buad">
+                <property name="text">
+                 <string>38400</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_sgconfig">
+                <property name="text">
+                 <string>清零基线</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_sg">
+                <property name="styleSheet">
+                 <string notr="true">color: rgb(255, 255, 255);</string>
+                </property>
+                <property name="text">
+                 <string>采集</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_ati">
+             <property name="styleSheet">
+              <string notr="true">#tab_ati{background-color: rgba(255, 255, 255, 0);}</string>
+             </property>
+             <attribute name="title">
+              <string>ATI</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <item>
+               <widget class="QPushButton" name="pushButton_atigconfig">
+                <property name="text">
+                 <string>清零基线</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_ati">
+                <property name="styleSheet">
+                 <string notr="true">color: rgb(255, 255, 255);</string>
+                </property>
+                <property name="text">
+                 <string>采集</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_imu">
+             <property name="styleSheet">
+              <string notr="true">#tab_imu{background-color: rgba(255, 255, 255, 0);}</string>
+             </property>
+             <attribute name="title">
+              <string>IMU</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <widget class="QLineEdit" name="lineEdit_imu_port">
+                <property name="text">
+                 <string>COM9</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_imuconfig">
+                <property name="text">
+                 <string>清零基线</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_imu">
+                <property name="styleSheet">
+                 <string notr="true">color: rgb(255, 255, 255);</string>
+                </property>
+                <property name="text">
+                 <string>采集</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_mark">
+            <property name="text">
+             <string>标记开始</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_start">
+            <property name="text">
+             <string>开始</string>
+            </property>
+            <property name="icon">
+             <iconset resource="main.qrc">
+              <normaloff>:/main/connect.png</normaloff>:/main/connect.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_autosave">
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 255, 255);</string>
+            </property>
+            <property name="text">
+             <string>自动保存</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_chart">
+         <property name="styleSheet">
+          <string notr="true">QGroupBox{
+border:0px solid rgb(10, 100, 10);
+
+}</string>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QGroupBox{
+
+border:0px solid rgb(10, 100, 10);
+border-bottom:1px solid rgb(100, 100, 10);
+}</string>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">color: rgb(255, 244, 244);
+font: 75 25pt &quot;Roman times&quot;;
+font-weight: bold;
+border-image:url(:/main/logo_transparent.png);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="margin">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="main.qrc"/>
+ </resources>
+ <connections/>
+</ui>

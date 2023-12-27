@@ -1,0 +1,5 @@
+numpy
+PyQt5==5.15.2
+pyqtgraph
+pyserial
+seaborn==0.12.2
