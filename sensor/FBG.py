@@ -2,6 +2,7 @@ from socket import socket, AF_INET, SOCK_DGRAM, timeout
 import threading, traceback
 from queue import Queue, Empty, Full
 import json
+import numpy as np
 
 """
 解调器服务模式程序端口
@@ -124,6 +125,12 @@ class FBGSensor(UDPServer):
             id = d[0]
             _d = d[3]
             self.mean[self._icToIndex(ch, id)] = _d
+
+    def FBG_ConvertForce(self, wavedata:np.ndarray)->dict:
+        out = {}
+        out["fx"] = wavedata[0][3]/1000
+        out["fy"] = wavedata[1][3]/1000
+        return out
 
 
 if __name__ == '__main__':

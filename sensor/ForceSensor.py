@@ -54,6 +54,8 @@ class FSensors():
             for ch, d in enumerate(_data):
                 name = f'ID{d[0]}-CH{d[1]}'
                 temp[name] = float(d[3])
+            for (key,value) in self.fbg.FBG_ConvertForce(_data).items():
+                temp[f"Force_{key}"] = value
             data["fbg"] = temp
         if hasattr(self, "ati"):
             d = self.ati.getMeasurement()
