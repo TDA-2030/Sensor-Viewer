@@ -38,7 +38,9 @@ if __name__ == "__main__":
     if build_path.exists():
         shutil.rmtree(build_path, ignore_errors=True)
 
-    shutil.copytree(str(Project_PATH), str(build_path), ignore=shutil.ignore_patterns(".git", "*.pyc", "__pycache__"))
+    program_path = build_path/"program"
+
+    shutil.copytree(str(Project_PATH), str(program_path), ignore=shutil.ignore_patterns(".git", "*.pyc", "__pycache__"))
 
     embed_pack = build_path/Path("python-3.8.10-embed-amd64.zip")
     env_folder = build_path/Path(embed_pack.stem)
@@ -61,6 +63,6 @@ if __name__ == "__main__":
     subprocess.check_call([str(env_folder.absolute()/"Scripts"/"pip.exe"), "install", "-r", str(Project_PATH/"requirements.txt")])
 
     with open(build_path/"run.bat", "w") as f:
-        f.write(f"cmd.exe /K %~dp0\{env_folder.parts[-1]}\python ui.py")
+        f.write(f"cmd.exe /K %~dp0\{env_folder.parts[-1]}\python {program_path.parts[-1]}/ui.py")
 
     # createZip(str(build_path))

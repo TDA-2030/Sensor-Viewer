@@ -1,5 +1,5 @@
 import sys
-from typing import Callable, List
+from typing import Callable, Dict, List
 from PyQt5.QtWidgets import QApplication, QVBoxLayout, QMainWindow, QMessageBox
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QWaitCondition, QMutex, QTimer
@@ -18,14 +18,10 @@ PRINT = print
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
 
-EXT_DIR = (ROOT/"sensor").resolve()
-if str(EXT_DIR) not in sys.path:
-    sys.path.append(str(EXT_DIR))  # add EXT_DIR to PATH
 
-
-import wit_normal
+from sensor import wit_normal
 import mainwin
-import ForceSensor
+from sensor import ForceSensor
 
 
 class MainWin(QMainWindow):
@@ -58,7 +54,7 @@ class MainWin(QMainWindow):
         self.pg_win = pg.GraphicsLayoutWidget(self.ui.groupBox_chart, show=True)
         self.ui.horizontalLayout.addWidget(self.pg_win)
         self.pw = []
-        pw = self.pg_win.addPlot(title="Raw data")
+        pw:pg.PlotItem = self.pg_win.addPlot(title="Raw data")
         labelStyle = {'color': '#ffffff', 'font-size': '16pt'}
         pw.getAxis("left").setLabel('PhysicValue', units='pm', **labelStyle)
         self.pw.append(pw)
@@ -66,6 +62,7 @@ class MainWin(QMainWindow):
         pw = self.pg_win.addPlot(title="Force Value")
         pw.getAxis("left").setLabel('Force', units='N', **labelStyle)
         self.pw.append(pw)
+        self.pw:List[pg.PlotItem]
 
         for pw in self.pw:
             pw.showGrid(x=True,y=True,alpha=0.4)
@@ -121,7 +118,7 @@ class MainWin(QMainWindow):
                 text = self.ui.lineEdit_imu_port.text().strip()
                 self.imu.connect(text, 9600)
 
-            def _get_data():
+            def _get_data() -> Dict[str, Dict[str, float]]:
                 m = {"mark":{"m":self.marked}}
                 _d = self.fsensors.fs_get_data()
                 _d.update(m)
@@ -157,6 +154,7 @@ class MainWin(QMainWindow):
             if len(self.plots)==0: # 没有可用通道，直接退出
                 print("no data to plot")
                 return
+            self.plots:Dict[str, pg.PlotDataItem]
 
             self.ui.pushButton_start.setText("关闭")
             if self.ui.checkBox_fbg.isChecked():
@@ -237,7 +235,7 @@ class MainWin(QMainWindow):
 
 
 class PlotRollLine():
-    def __init__(self, pw:List[pg.PlotWidget], plots:dict) -> None:
+    def __init__(self, pw:List[pg.PlotWidget], plots:Dict[str, pg.PlotDataItem]) -> None:
         self.startTime = time.perf_counter()
         self.plots = plots
         self.ptr5 = 0
@@ -266,8 +264,9 @@ class PlotRollLine():
             self.data5[:, :tmp.shape[1]] = tmp
 
     def __del__(self):
-        for c in self.plots:
-            self.pw.removeItem(self.plots[c])
+        for _pw in self.pw:
+            for k, pditem in self.plots.items():
+                _pw.removeItem(pditem)
 
 
 class ChartThread(QThread):

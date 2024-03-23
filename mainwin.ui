@@ -14,7 +14,7 @@
    <string>Sensor Viewer</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="main.qrc">
+   <iconset resource="resource/main.qrc">
     <normaloff>:/main/logo.ico</normaloff>:/main/logo.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -378,7 +378,7 @@ border-left:5px solid rgb(10, 100, 10);
              <string>开始</string>
             </property>
             <property name="icon">
-             <iconset resource="main.qrc">
+             <iconset resource="resource/main.qrc">
               <normaloff>:/main/connect.png</normaloff>:/main/connect.png</iconset>
             </property>
            </widget>
@@ -516,7 +516,7 @@ border-image:url(:/main/logo_transparent.png);</string>
   </widget>
  </widget>
  <resources>
-  <include location="main.qrc"/>
+  <include location="resource/main.qrc"/>
  </resources>
  <connections/>
 </ui>
