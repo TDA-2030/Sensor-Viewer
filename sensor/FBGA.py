@@ -18,6 +18,7 @@ IP 地址    192.168.0.10        192.168.0.X
 
 class UDPClient():
 
+    _lock = threading.Lock()
     def __init__(self) -> None:
         pass
 
@@ -28,49 +29,11 @@ class UDPClient():
         self.udpCliSock.settimeout(1)
         self.udpCliSock.bind((ip, port))
 
-        self.recv_queue = Queue(10)
-        self.recv_queue.queue.clear()
-        self.thread = threading.Thread(target=self._recv, name='udprecv')
-        self.thread.setDaemon(True)
-        self.thread.start() 
-
     def disconnect(self):
         self.udpCliSock.close()
-        if hasattr(self, 'thread'):
-            self.thread.join()
 
-    def _recv(self):
-        data = b""
-        packages = 0
-        while True:
-            try:
-                d, server = self.udpCliSock.recvfrom(4200)
-                data += d
-                packages += 1
-                if packages == 3:
-                    self.recv_queue.put(data, block=False)
-                    data = b""
-                    packages = 0
-            except Full:
-                pass
-                # print("queue full")
-            except OSError:
-                break
-            except Exception as e:
-                traceback.print_exc()
-                break
-
-
-    def send(self, msg: bytes, wait_reply:bool=True):
+    def send(self, msg: bytes):
         self.udpCliSock.sendto(msg, self.server_ip)
-        if not wait_reply:
-            return
-        try:
-            data: str = self.recv_queue.get(block=True, timeout=2)
-            return data
-        except Empty:
-            print("command no ack")
-        return 
 
         # udpCliSock.close()
 
@@ -79,7 +42,20 @@ class FBGASensor(UDPClient):
 
     def __init__(self) -> None:
         super().__init__()
-        self.mean = np.zeros((16, 32))
+        self.channel_shape = (16, 32)
+        self.mean = np.zeros(self.channel_shape)
+        self.channel_mask = np.ones(self.channel_shape).astype(bool)
+
+    def connect(self, ip, port, server_ip=("192.168.0.10", 1234)):
+        super().connect(ip, port, server_ip)
+        _d = self.FBGA_GetWaveData(False)
+        self.channel_mask = _d.astype(bool)
+    
+    def disconnect(self):
+        self.is_stream = False
+        if hasattr(self, 'thread'):
+            self.thread.join()
+        return super().disconnect()
 
     def FBGA_GetDeviceInfo(self)->dict:
         data = self.send(b"870002")
@@ -112,30 +88,76 @@ class FBGASensor(UDPClient):
         for i in range(d.size):
             d[i] = int.from_bytes(data[4+i:6+i], 'big')
         return ch, d
-    
+
     def FBGA_GetWaveData(self, diff:bool=True)->np.ndarray:
-        data = self.send(b"570002")
+        data = b""
+        self._lock.acquire()
+        self.send(b"570002")
+        try:
+            for ii in range(3):
+                d, server = self.udpCliSock.recvfrom(1400)
+                data += d
+        except OSError:
+            self._lock.release()
+            return self.mean
         if not data[0] == 87:
             raise ValueError("command error")
         data = data[3:]
-        d = np.zeros((16, 32))
+        d = self.to_wavedata(data)
+        if diff:
+            d -= self.mean
+        self._lock.release()
+        return d
+
+    def FBGA_GetStreamWaveData(self)->np.ndarray:
+        data = self.recv_queue.get()
+        return self.to_wavedata(data)
+
+    def to_wavedata(self, data, diff:bool=True):
+        d = np.zeros(self.channel_shape)
         for i in range(d.shape[0]):
             for j in range(d.shape[1]):
                 c = i*32+j
-                d[i][j] = int.from_bytes(data[c*3:c*3+3], 'big')
-        return d - self.mean if diff else d
-    
-    def FBGA_ConvertForce(self, wavedata:np.ndarray)->dict:
-        out = {}
-        out["fx"] = wavedata[0][0]/1000
-        out["fy"] = wavedata[1][0]/1000
-        return out
-    
-    def FBGA_WaveMode(self, is_contiune:bool):
-        self.send(b"560003FF" if is_contiune else b"56000300", wait_reply=False)
+                d[i][j] = int.from_bytes(data[c*3:c*3+3], 'big') / 10000
+        return d
 
     def FBGA_tare(self):
         self.mean = self.FBGA_GetWaveData(False).copy()
+
+    def FBGA_WaveMode(self, is_contiune:bool):
+        if is_contiune:
+            self.recv_queue = Queue(10)
+            self.recv_queue.queue.clear()
+            self.thread = threading.Thread(target=self._recv, name='udprecv', daemon=True)
+            self.is_stream = True
+            self.thread.start() 
+        else:
+            self.is_stream = False
+            if hasattr(self, 'thread'):
+                self.thread.join()
+        self.send(b"560003FF" if is_contiune else b"56000300")
+
+    def _recv(self):
+        while self.is_stream:
+            try:
+                data = b""
+                for ii in range(3):
+                    d, server = self.udpCliSock.recvfrom(1400)
+                    data += d
+                self.recv_queue.put(data, block=False)
+            except Full:
+                time.sleep(0.1)
+                # print("queue full")
+            except OSError:
+                break
+            except Exception as e:
+                traceback.print_exc()
+                break
+
+    def FBGA_ConvertForce(self, wavedata:np.ndarray)->dict:
+        out = {}
+        # 波长转换为力值
+        return out
 
 
 if __name__ == '__main__':
@@ -143,11 +165,22 @@ if __name__ == '__main__':
     s.connect('192.168.0.111', 4567, server_ip=("192.168.0.10", 1234))
     import time 
 
-    while True:
+    try:
+        cnt = 0
+        last_t = time.perf_counter()
+        s.FBGA_WaveMode(False)
+        # s.FBGA_tare()
+        print(s.channel_mask)
+        while True:
+            info = s.FBGA_GetWaveData()
+            print(f"Wave data:{info[np.where(s.channel_mask==True)]}")
+            # time.sleep(0.001)
+            cnt += 1
+            if cnt > 50:
+                _t = time.perf_counter()
+                print(f"Rate: {cnt/(_t - last_t):.2f} samples/sec")
+                last_t = _t
+                cnt = 0
+    except KeyboardInterrupt as e:
+        s.disconnect()
 
-        info = s.FBGA_GetWaveData()
-        print("wave data: ", info[1])
-        time.sleep(0.1)
-        # break
-
-    

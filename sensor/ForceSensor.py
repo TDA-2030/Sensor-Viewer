@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-
+import time
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]
 if str(ROOT) not in sys.path:
@@ -12,11 +12,39 @@ import ZNBSQ
 import numpy as np
 from collections import OrderedDict
 import FBGA
+from functools import wraps
+import types
+
+class CallTimer:
+    def __init__(self, func):
+        wraps(func)(self)
+        self.call_count = 0
+        self.last_t = time.perf_counter()
+
+    def __call__(self, *args, **kwargs):
+        result = self.__wrapped__(*args, **kwargs)
+        self.call_count += 1
+        if self.call_count > 100:
+            t = time.perf_counter()
+            print(f"Sample rate: {100/(t-self.last_t):.2f}")
+            self.last_t = t
+            self.call_count = 0
+
+        return result
+    
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+        else:
+            return types.MethodType(self, instance)
+
+
 
 class FSensors():
 
     def __init__(self) -> None:
-        pass
+        self.call_count = 0
+        self.last_t = time.perf_counter()
 
     def fs_connect_fbg(self, ip:str, port:int):
         self.fbg = FBG.FBGSensor()
@@ -53,7 +81,7 @@ class FSensors():
             self.fbga.disconnect()
             del self.fbga
 
-    def fs_get_data(self, timeout=None)->dict: 
+    def fs_get_data(self)->dict: 
 
         data = OrderedDict()
         if hasattr(self, "fbg"):
@@ -78,12 +106,26 @@ class FSensors():
         if hasattr(self, "fbga"):
             temp=OrderedDict()
             _data = self.fbga.FBGA_GetWaveData()
-            for i, d in enumerate(_data):
-                if d[0] !=0:
-                    name = f'CH{i}'
-                    temp[name] = d[0]
+            idx = np.where(self.fbga.channel_mask==True)
+            for x, y in zip(*idx):
+                name = f'CH{x}-{y}'
+                temp[name] = _data[x, y]
             for (key,value) in self.fbga.FBGA_ConvertForce(_data).items():
                 temp[f"Force_{key}"] = value
             data["fbga"] = temp
+
+        self.call_count += 1
+        if self.call_count > 200:
+            t = time.perf_counter()
+            print(f"Sample rate: {200/(t-self.last_t):.2f}")
+            self.last_t = t
+            self.call_count = 0
+
         return data
 
+if __name__ == "__main__":
+    fbga = FSensors()
+
+    for i in range(200):
+        time.sleep(0.001)
+        print(fbga.fs_get_data())

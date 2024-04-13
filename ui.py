@@ -119,9 +119,9 @@ class MainWin(QMainWindow):
                 self.imu.connect(text, 9600)
 
             def _get_data() -> Dict[str, Dict[str, float]]:
-                m = {"mark":{"m":self.marked}}
+                # m = {"mark":{"m":self.marked}}
                 _d = self.fsensors.fs_get_data()
-                _d.update(m)
+                # _d.update(m)
                 if self.imu.is_connected:
                     _d = {**_d, **self.imu.get_imu_data()}
                 return _d
@@ -275,30 +275,18 @@ class ChartThread(QThread):
     def __init__(self, get_data_cb:Callable, parent=None):
         super(ChartThread, self).__init__(parent)
         self.get_data_cb = get_data_cb
-        self.last_t = 0
-        self.elapse = 30
         self.isRun = True
-        self.mutex = QMutex()
-        self.cond = QWaitCondition()
-        
 
     def __del__(self):
-        self.wait()
+        print(f"del {self.__class__.__name__}")
 
     def stopRun(self):
         self.isRun = False
 
-    def get_real_fps(self) -> float:
-        return 1.0 / self.elapse
-
     def run(self):
         while self.isRun:
-            t0 = time.time()
             res = self.get_data_cb()
             self.sinOut.emit(res)
-            t = time.time()
-            self.elapse = t - self.last_t
-            self.msleep(5)
 
 # import pyqtgraph.examples
 # pyqtgraph.examples.run()
