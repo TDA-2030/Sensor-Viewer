@@ -12,15 +12,21 @@
 - [x] ATI 六维力传感器
 - [x] IMU姿态传感器
 
+## 快速使用
 
+1. 从 [Release](https://github.com/TDA-2030/Sensor-Viewer/releases) 下载最新程序
+2. 解压缩后运行`run_sample.bat`打开采样程序；或运行`run_calibrate.bat`打开自动标定程序
 
-## 安装
+## 从源码使用
 
-Python版本： python3.8 
+Python版本： python3.8.10
 
-### 安装依赖
+1. 克隆代码：
+    ```shell
+    git clone https://github.com/TDA-2030/Sensor-Viewer.git
+    ```
 
-1. python 包安装：
+2. python 包安装：
 
    ```shell
    pip install -r requirements.txt
@@ -31,6 +37,4 @@ Python版本： python3.8
     pip install pyqt5-tools
     ```
 
-## 使用
-
-运行`python ui.py` 打开界面
+4. 运行`python ui.py` 打开界面

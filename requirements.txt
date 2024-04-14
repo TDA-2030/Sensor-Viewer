@@ -3,3 +3,5 @@ PyQt5==5.15.2
 pyqtgraph
 pyserial
 seaborn==0.12.2
+simple_pid==2.0.0
+minimalmodbus==2.1.1

@@ -118,7 +118,7 @@ class FBGASensor(UDPClient):
         for i in range(d.shape[0]):
             for j in range(d.shape[1]):
                 c = i*32+j
-                d[i][j] = int.from_bytes(data[c*3:c*3+3], 'big') / 10000
+                d[i][j] = int.from_bytes(data[c*3:c*3+3], 'big') / 10 # 装换为pm单位
         return d
 
     def FBGA_tare(self):

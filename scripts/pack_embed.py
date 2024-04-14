@@ -9,7 +9,7 @@ FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]
 
 Project_PATH = (ROOT/'..').resolve()
-Version = "v0.1"
+Version = "v0.2"
 
 
 def download_progress_hook(count, blockSize, totalSize):
@@ -62,7 +62,10 @@ if __name__ == "__main__":
     subprocess.check_call([str(env_folder.absolute()/"python"), env_folder/"get-pip.py"])
     subprocess.check_call([str(env_folder.absolute()/"Scripts"/"pip.exe"), "install", "-r", str(Project_PATH/"requirements.txt")])
 
-    with open(build_path/"run.bat", "w") as f:
-        f.write(f"cmd.exe /K %~dp0\{env_folder.parts[-1]}\python {program_path.parts[-1]}/ui.py")
+    with open(build_path/"run_sample.bat", "w") as f:
+        f.write(f"cmd.exe /K \"%~dp0\{env_folder.parts[-1]}\python\" {program_path.parts[-1]}/ui.py")
+
+    with open(build_path/"run_calibrate.bat", "w") as f:
+        f.write(f"cmd.exe /K \"%~dp0\{env_folder.parts[-1]}\python\" {program_path.parts[-1]}/auto_cal/ui.py")
 
     # createZip(str(build_path))
