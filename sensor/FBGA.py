@@ -1,6 +1,7 @@
 from socket import socket, AF_INET, SOCK_DGRAM, timeout
 import threading, traceback
 from queue import Queue, Empty, Full
+from typing import Tuple
 import numpy as np
 
 MIN_WAVELENGTH = 1527000
@@ -58,7 +59,15 @@ class FBGASensor(UDPClient):
         return super().disconnect()
 
     def FBGA_GetDeviceInfo(self)->dict:
-        data = self.send(b"870002")
+        self.send(b"870002")
+        data = b""
+        try:
+            for ii in range(3):
+                d, server = self.udpCliSock.recvfrom(1400)
+                data += d
+        except OSError:
+            self._lock.release()
+            return None
         if not data[0] == 135:
             raise ValueError("command error")
         deviceInfo = {}
@@ -73,20 +82,33 @@ class FBGASensor(UDPClient):
         for i in range(16):
             Peak[i] = int.from_bytes(d[i*4:i*4+2], 'big')
             PV[i] = int.from_bytes(d[i*4+2:i*4+4], 'big')
-            Gain[i] = int.from_bytes(d[74+i], 'big')
+            Gain[i] = int(d[74+i])
         deviceInfo["Peak"] = Peak
         deviceInfo["PV"] = PV
         deviceInfo["Gain"] = Gain
         return deviceInfo
 
-    def FBGA_GetSpectrumData(self, channel:int):
-        data = self.send(b"580003"+channel.to_bytes(1, 'big', signed=False))
+    def FBGA_GetSpectrumData(self, channel:int)->Tuple[int, np.ndarray]:
+        if channel > 8:
+            print("only support 8 channel")
+            return
+        self.send(b"580003"+bytes(f"{channel:02d}", encoding='utf-8'))
+        data = b""
+        try:
+            for ii in range(3):
+                d, server = self.udpCliSock.recvfrom(1400)
+                data += d
+        except OSError:
+            self._lock.release()
+            return None
         if not data[0] == 88:
             raise ValueError("command error")
-        d = np.zeros(2051)
-        ch = int.from_bytes(data[3], 'big')
-        for i in range(d.size):
-            d[i] = int.from_bytes(data[4+i:6+i], 'big')
+        # d = np.zeros((1024,))
+        d = np.frombuffer(data[4:4106], dtype='>u2')
+        ch = int(data[3])
+        # data = data[4:]
+        # for i in range(d.size):
+        #     d[i] = int.from_bytes(data[i*2:(i*2)+2], 'big')
         return ch, d
 
     def FBGA_GetWaveData(self, diff:bool=True)->np.ndarray:
@@ -160,12 +182,48 @@ class FBGASensor(UDPClient):
         return out
 
 
+def show_SpectrumData(Start_Wavelength:float, End_Wavelength:float):
+    import matplotlib.pyplot as plt
+
+    info = s.FBGA_GetSpectrumData(1)
+
+    chunk_size = info[1].size
+    # 初始化时间轴和数据缓冲区
+    t = np.linspace(Start_Wavelength, End_Wavelength, chunk_size)
+    data = np.zeros(chunk_size)
+
+    # 创建频谱图窗口和曲线对象
+    plt.ion()
+    fig, ax = plt.subplots()
+    line, = ax.plot(t, data)
+    # ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Amplitude')
+    ax.set_ylim(0, 20000)
+
+
+    # 实时更新波形图
+    while True:
+        info = s.FBGA_GetSpectrumData(1)
+        data = info[1]
+        wl = s.FBGA_GetWaveData()
+        print(f"ch:{info[0]}, max:{data.max()}, Wave data:{wl[np.where(s.channel_mask==True)]}")
+
+
+        # 更新波形图
+        line.set_ydata(data)
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+
 if __name__ == '__main__':
     s = FBGASensor()
     s.connect('192.168.0.111', 4567, server_ip=("192.168.0.10", 1234))
+    dev_info = s.FBGA_GetDeviceInfo()
+    print(f"info:{dev_info}")
     import time 
 
     try:
+        show_SpectrumData(dev_info['Start_Wavelength'], dev_info['End_Wavelength'])
+        exit()
         cnt = 0
         last_t = time.perf_counter()
         s.FBGA_WaveMode(False)
